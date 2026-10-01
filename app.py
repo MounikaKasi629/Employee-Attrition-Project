@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -17,7 +18,6 @@ st.write("Employee Attrition Analysis")
 df = pd.read_csv("employee_attrition_cleaned.csv")
 
 
-
 total_employees = df.shape[0]
 
 employees_left = (df["Attrition"] == "Yes").sum()
@@ -29,28 +29,30 @@ attrition_rate = (employees_left / total_employees) * 100
 
 col1, col2, col3 = st.columns(3)
 
-col1.metric("Total Employees",total_employees)
+col1.metric("Total Employees", total_employees)
 
-col2.metric("Employees Left",employees_left)
+col2.metric("Employees Left", employees_left)
 
-col3.metric("Attrition Rate",f"{attrition_rate:.2f}%")
+col3.metric("Attrition Rate", f"{attrition_rate:.2f}%")
 
 
 st.divider()
 
 
+# Employee Attrition - Pie Chart
 col1, col2 = st.columns(2)
 
 with col1:
 
     st.subheader("Employee Attrition")
 
+    attrition_counts = df["Attrition"].value_counts()
+
     fig, ax = plt.subplots(figsize=(6, 4))
 
-    sns.countplot(data=df,x="Attrition", ax=ax)
+    ax.pie(attrition_counts.values,labels=attrition_counts.index,autopct="%1.1f%%",startangle=90)
 
-    ax.set_xlabel("Attrition")
-    ax.set_ylabel("Number of Employees")
+    ax.set_title("Employee Attrition Distribution")
 
     st.pyplot(fig)
 
@@ -67,8 +69,7 @@ with col2:
 
     fig, ax = plt.subplots(figsize=(6, 4))
 
-    sns.barplot(
-        x=department_rate.index,y=department_rate.values,ax=ax)
+    sns.barplot(x=department_rate.index,y=department_rate.values,ax=ax)
 
     ax.set_xlabel("Department")
     ax.set_ylabel("Attrition Rate (%)")
@@ -77,6 +78,8 @@ with col2:
 
     st.pyplot(fig)
 
+
+# Job Role and Overtime
 col1, col2 = st.columns(2)
 
 with col1:
@@ -91,7 +94,7 @@ with col1:
 
     fig, ax = plt.subplots(figsize=(6, 4))
 
-    sns.barplot(x=jobrole_rate.index,y=jobrole_rate.values,ax=ax)
+    sns.barplot(x=jobrole_rate.index,y=jobrole_rate.values, ax=ax)
 
     ax.set_xlabel("Job Role")
     ax.set_ylabel("Attrition Rate (%)")
@@ -99,6 +102,7 @@ with col1:
     plt.xticks(rotation=45)
 
     st.pyplot(fig)
+
 
 with col2:
 
@@ -119,40 +123,40 @@ with col2:
 
     st.pyplot(fig)
 
-col1, col2 = st.columns(2)
 
+# Age and Monthly Income - Scatter Plots
+col1, col2 = st.columns(2)
 
 with col1:
 
-    st.subheader("Average Age vs Attrition")
+    st.subheader("Age vs Monthly Income")
 
     fig, ax = plt.subplots(figsize=(6, 4))
 
-    sns.barplot(data=df,x="Attrition",y="Age",ax=ax)
+    sns.scatterplot(data=df,x="Age",y="MonthlyIncome",hue="Attrition",ax=ax)
 
-    ax.set_xlabel("Attrition")
-    ax.set_ylabel("Average Age")
+    ax.set_xlabel("Age")
+    ax.set_ylabel("Monthly Income")
 
     st.pyplot(fig)
-
 
 
 with col2:
 
-    st.subheader("Average Monthly Income vs Attrition")
+    st.subheader("Age vs Years at Company")
 
     fig, ax = plt.subplots(figsize=(6, 4))
 
-    sns.barplot(data=df,x="Attrition",y="MonthlyIncome",ax=ax)
+    sns.scatterplot(data=df,x="Age",y="YearsatCompany",hue="Attrition",ax=ax)
 
-    ax.set_xlabel("Attrition")
-    ax.set_ylabel("Average Monthly Income")
+    ax.set_xlabel("Age")
+    ax.set_ylabel("Years at Company")
 
     st.pyplot(fig)
 
 
+# Job Satisfaction and Years at Company
 col1, col2 = st.columns(2)
-
 
 with col1:
 
@@ -172,9 +176,11 @@ with col2:
 
     st.subheader("Average Years at Company vs Attrition")
 
+    years_attrition = (df.groupby("Attrition")["YearsatCompany"].mean().reset_index())
+
     fig, ax = plt.subplots(figsize=(6, 4))
 
-    sns.barplot(data=df,x="Attrition",y="YearsatCompany",ax=ax)
+    sns.lineplot(data=years_attrition,x="Attrition",y="YearsatCompany",marker="o",ax=ax)
 
     ax.set_xlabel("Attrition")
     ax.set_ylabel("Average Years at Company")
@@ -182,6 +188,7 @@ with col2:
     st.pyplot(fig)
 
 
+# Job Level and Business Travel
 col1, col2 = st.columns(2)
 
 with col1:
@@ -204,7 +211,6 @@ with col1:
     st.pyplot(fig)
 
 
-
 with col2:
 
     st.subheader("Attrition Rate by Business Travel")
@@ -213,7 +219,7 @@ with col2:
 
     attrition_travel = (df[df["Attrition"] == "Yes"].groupby("BusinessTravel").size())
 
-    travel_rate = ( attrition_travel / total_travel) * 100
+    travel_rate = (attrition_travel / total_travel) * 100
 
     fig, ax = plt.subplots(figsize=(6, 4))
 
@@ -228,6 +234,7 @@ with col2:
 
 
 st.divider()
+
 
 st.header("Key Findings")
 
